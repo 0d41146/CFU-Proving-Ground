@@ -79,9 +79,9 @@ module main (
 
     wire vmem_we = dbus_we & (dbus_addr[29]);
     wire [15:0] vmem_addr =  dbus_addr[15:0];
-    wire [ 2:0] vmem_wdata = dbus_wdata[2:0];
+    wire [ 7:0] vmem_wdata = dbus_wdata[7:0];
     wire [15:0] vmem_raddr;
-    wire [ 2:0] vmem_rdata_t;
+    wire [ 7:0] vmem_rdata_t;
     vmem vmem (
         .clk_i              (clk                ), // input wire
         .we_i               (vmem_we            ), // input wire
@@ -204,16 +204,16 @@ module vmem (
     input wire clk_i,
     input wire        we_i,
     input wire [15:0] waddr_i,
-    input wire [2:0] wdata_i,
+    input wire [7:0] wdata_i,
     input wire [15:0] raddr_i,
-    output wire [2:0] rdata_o
+    output wire [7:0] rdata_o
 );
 
-    reg [2:0] vmem_lo [0:32767]; // vmem
-    reg [2:0] vmem_hi [0:32767]; // vmem
+    reg [7:0] vmem_lo [0:32767]; // vmem
+    reg [7:0] vmem_hi [0:32767]; // vmem
 
-    reg [2:0] rdata_lo;
-    reg [2:0] rdata_hi;
+    reg [7:0] rdata_lo;
+    reg [7:0] rdata_hi;
     reg       sel;
 
     always @(posedge clk_i) begin
@@ -233,7 +233,14 @@ module vmem (
     reg [15:0] r_adr_p = 0;
     reg [15:0] r_dat_p = 0;
 
-    wire [15:0] data = {{5{wdata_i[2]}}, {6{wdata_i[1]}}, {5{wdata_i[0]}}};
+    wire [7:0] color_8bit = wdata_i[7:0];
+    wire [2:0] r3 = (color_8bit & 'hE0) >> 5;
+    wire [2:0] g3 = (color_8bit & 'h1C) >> 2;
+    wire [1:0] b2 = (color_8bit & 'h03);
+
+    wire [15:0] rgb565 = (r3 << 13) | (g3 << 7) | b2 << 3;
+
+    wire [15:0] data = rgb565;
     always @(posedge clk_i) if(we_i) begin
         case (waddr_i[15])
             0: if(vmem_lo[waddr_i] != wdata_i) begin
