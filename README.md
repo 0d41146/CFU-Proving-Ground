@@ -107,9 +107,9 @@ If you change the size of the data memory, please appropriately modify the LENGT
 
 | addr   |  description                     |
 | -----------| -----------------------------|
-| 0x00000000 - 0x0000FFFF | 64KiB Instruction Memory     |
-| 0x10000000 - 0x10003FFF | 16KiB Data Memory            |
-| 0x20000000 - 0x2000FFFF | 64KiB Video Memory    |
+| 0x00000000 - 0x00000FFF |   4KiB Instruction Memory     |
+| 0x10000000 - 0x10018FFF | 100KiB Data Memory            |
+| 0x20000000 - 0x2000FFFF |  64KiB Video Memory    |
 | 0x40000000 | performance counter control (0: reset, 1: start, 2: stop)|
 | 0x40000004 | mcycle                  |
 | 0x40000008 | mcycleh                 |
